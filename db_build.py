@@ -29,21 +29,5 @@ cursor.close()
 f.close()
 connect_db.close()
 
-# Create a new connection & cursor
-new_connect = sqlite3.connect("marcus.db")
-new_cursor = new_connect.cursor()
-
-# Get the data
-res = new_cursor.execute('''SELECT content FROM meditation''')
-res.fetchall()
-
-# Print the data
-for row in res:
-    print(row)
-
-# close the connection
-new_cursor.close()
-new_connect.close()
-
 print('Done!')
 
