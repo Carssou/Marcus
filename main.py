@@ -10,12 +10,14 @@ def update_text(label, result):
 
     If the list of quotes is empty, update the label telling so
     """
-    result = db_query.show_result(cptr="Chapitre "+str(randint(1,10)))
-    if result:
+    
+    if result[0]:
         # If the quote file is read by the previous function, set the label to the text of random quote
-        label.config(text=result)
+        label.config(text=result[:])
     else:
         label.config(text='No quotes found.')
+
+#def get_details(label, result):
 
 def create_ui(root, result):
     """
@@ -44,19 +46,38 @@ def create_ui(root, result):
                      bg='#c6c5ef')
     title.pack(expand=False, fill='both')
 
-    # Add text label
+    # Query the database
+    result = db_query.show_result(cptr="Chapitre "+str(randint(2,10)))
+
+    # Add book label to display the book title
+    book_label = tk.Label(text_tab, font=('Verdana',25),
+                            wraplength=550)
+    book_label.pack(expand=True)
+
+    update_text(book_label, result[0])
+
+    # Add chapter label to display the chapter title
+    chapter_label = tk.Label(text_tab, font=('Verdana',20),
+                           bg='#c6c5ef', wraplength=550)
+    chapter_label.pack(expand=True)
+
+    # Update the label with a random quote
+    update_text(chapter_label, result[1])
+
+    # Add text label to display the main text
     text_label = tk.Label(text_tab, font=('Verdana',15),
                            bg='#c6c5ef', wraplength=550)
     text_label.pack(expand=True, fill='both')
 
     # Update the label with a random quote
-    update_text(text_label, result)
+    update_text(text_label, result[2])
+
 
     #  Add a button to request another quote
-    text_button = tk.Button(text_tab, text='Autre paragraphe',
-                             command=(lambda: update_text(text_label, result)),
-                             font=('Arial', 15), bg='#c6c5ef')
-    text_button.pack()
+    #text_button = tk.Button(text_tab, text='Autre paragraphe',
+                             #command=(lambda: update_text(text_label, result)),
+     #                        font=('Arial', 15), bg='#c6c5ef')
+    #text_button.pack()
 
     favorite_label = tk.Label(favorite_tab, text='Journal placeholder',
                              font=('Verdana',20,'bold', 'italic'),
@@ -85,6 +106,10 @@ def create_ui(root, result):
     help_menu = tk.Menu(top_menu)
     help_menu.add_command(label='About', command=lambda: messagebox.showinfo('About', 'Motivation Alpha ver 0.01'))
     top_menu.add_cascade(label='Help', menu=help_menu)
+
+    # close the connection
+    db_query.new_cursor.close()
+    db_query.new_connect.close()
 
 
 def main():
