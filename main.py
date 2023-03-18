@@ -1,6 +1,5 @@
 import tkinter as tk
 from tkinter import ttk, messagebox
-from random import randint
 import db_query
 
 
@@ -19,7 +18,7 @@ def update_text(label, result):
 
 #def get_details(label, result):
 
-def create_ui(root, result):
+def create_ui(root):
     """
     Creates the user interface
     """
@@ -40,29 +39,50 @@ def create_ui(root, result):
     tabs.add(favorite_tab, text='Favoris')
     tabs.pack(expand=True, fill='both')
 
+    # Get the selected chapter
+    def get_selected_chapter():
+        """
+        Get the selected chapter
+        """
+        chapter = clicked.get()
+        result = db_query.show_result(cptr=chapter)
+        return result
+    
+    def update_labels(*args):
+        update_text(book_label, get_selected_chapter()[0])
+        update_text(chapter_label, get_selected_chapter()[1])
+        update_text(text_label, get_selected_chapter()[2])
+    
+    # Create the dropdown menu for chapter selection
+    clicked = tk.StringVar()
+    #clicked.set("f")
+
+    drop = ttk.OptionMenu(text_tab, clicked, *db_query.dropdowns_options())
+    drop.pack(expand=True, pady=0)
+    
+    clicked.trace("w", update_labels)
+
     # Add title to the app
     title = tk.Label(root,text='Marcus Alpha ver 0.01',
                      font=('Verdana',10),
                      bg='#c6c5ef')
     title.pack(expand=False, fill='both')
 
-    # Query the database
-    result = db_query.show_result(cptr="Chapitre "+str(randint(2,10)))
 
     # Add book label to display the book title
     book_label = tk.Label(text_tab, font=('Verdana',25),
                             wraplength=550)
-    book_label.pack(expand=True)
+    book_label.pack(expand=True, fill="x")
 
-    update_text(book_label, result[0])
+    update_text(book_label, get_selected_chapter()[0])
 
     # Add chapter label to display the chapter title
     chapter_label = tk.Label(text_tab, font=('Verdana',20),
                            bg='#c6c5ef', wraplength=550)
-    chapter_label.pack(expand=True)
+    chapter_label.pack(expand=True, fill="x")
 
     # Update the label with a random quote
-    update_text(chapter_label, result[1])
+    update_text(chapter_label, get_selected_chapter()[1])
 
     # Add text label to display the main text
     text_label = tk.Label(text_tab, font=('Verdana',15),
@@ -70,14 +90,14 @@ def create_ui(root, result):
     text_label.pack(expand=True, fill='both')
 
     # Update the label with a random quote
-    update_text(text_label, result[2])
+    update_text(text_label, get_selected_chapter()[2])
 
 
     #  Add a button to request another quote
-    #text_button = tk.Button(text_tab, text='Autre paragraphe',
-                             #command=(lambda: update_text(text_label, result)),
-     #                        font=('Arial', 15), bg='#c6c5ef')
-    #text_button.pack()
+    text_button = tk.Button(text_tab, text='Autre paragraphe',
+                             command=(lambda: update_labels()),
+                             font=('Arial', 15), bg='#c6c5ef')
+    text_button.pack()
 
     favorite_label = tk.Label(favorite_tab, text='Journal placeholder',
                              font=('Verdana',20,'bold', 'italic'),
@@ -108,18 +128,18 @@ def create_ui(root, result):
     top_menu.add_cascade(label='Help', menu=help_menu)
 
     # close the connection
-    db_query.new_cursor.close()
-    db_query.new_connect.close()
+    #db_query.new_cursor.close()
+    #db_query.new_connect.close()
 
 
 def main():
     """
     Mendatory function to create the window, also define the quotes file path
     """
-    result = db_query.show_result(cptr="Chapitre "+str(randint(1,10)))
+    #result = db_query.show_result()
 #    quotes = read_quotes('/Users/ludo/PythonScripts/citations.txt')
     root = tk.Tk()
-    create_ui(root, result)
+    create_ui(root)
     root.mainloop()
 
 # Check if the main function is called by the script and not by a module

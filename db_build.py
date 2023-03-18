@@ -16,7 +16,7 @@ cursor.execute('''CREATE TABLE IF NOT EXISTS meditation (
 )''')
 
 # insert data into the table from a csv file
-with open('meditations.csv', 'r') as f:
+with open('Marcus.csv', 'r') as f:
     reader = csv.reader(f, delimiter=";")
     for row in reader:
         cursor.execute('''INSERT INTO meditation (book, chapter, content, language) VALUES (?,?,?,?)''', row)
